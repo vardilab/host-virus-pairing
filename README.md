@@ -24,8 +24,8 @@ BBMap/38.90
 
 ### Scripts:
 
-```assemble_cells.sh``` - Pull reads of cells by barcode, trim reads and assemble them (for each cell) 
-```pull_trim_clean.sh`` - Pull reads of cells by barcode and trim reads without assembling 
+```assemble_cells.sh``` - Pull reads of cells by barcode, trim reads and assemble them (for each cell)  
+```pull_trim_clean.sh``` - Pull reads of cells by barcode and trim reads without assembling  
 ```create_gtf.sh``` - Create a pseudo-gft file  
 ```00.00.raw_UMI_counts_10X_data.py``` - Convert cellranger count metrix to pickle  
 ```00.01.filter_normalize_scale_single_cell_data.py```  - Preprocessing UMI tables
@@ -176,7 +176,7 @@ Results of 18s rRNA homology against the PR2 and metaPR2 databases are summarize
 Pick only the best hit with identity of >= 99 percent and an alignment length of >100 bp  
 ```  
 usage:  
-    01.summarize_blast.py --data_dir DATA_DIR   
+    summarize_blast.py --data_dir DATA_DIR   
                         --database DB  
   
 argument:  
