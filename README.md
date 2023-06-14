@@ -12,6 +12,9 @@ sortmerna/4.3.6
 bioawk  
 bcl2fastq  
 cellranger  
+rsem/1.3.1  
+perl  
+bowtie2/2.3.3  
 seqtk/1.2  
 TrimGalore/0.6.5   
 gcc/9.2.0  
@@ -197,10 +200,9 @@ filterbyname.sh in=cells.transcripts.95.bbduk.fasta out=cells.filtered.fasta inc
 cat transcriptome_ehuxleyi.EhVM1.fasta cells.filtered.fasta > combined_cells_ehux.fasta  
   
 ### The new transcriptome is de-duplicated using cd-hit  
-module load cd-hit  
-  
+```
 cd-hit-est -c 0.95 -T 16 -i combined_cells_ehux.fasta -o combined_cells_ehux.95.fasta  
-  
+```
 ### A reference database is built from from the combined transcriptome  
   
 input: combined database file  
@@ -208,20 +210,22 @@ scripts:
 create_gtf.sh  
   
 a. create a pseudo-GTF file  
-  
+```  
 create_gtf.sh combined_cells_ehux.95.fasta  
-  
+```  
 b. create a reference file  
+```
 cellranger mkref --genome=$REFNAME --fasta=$FASTA --genes=$GTF --memgb=4  
-  
+```  
 ### Map raw fastq files to the reference  
+```
 cellranger count --id=$ID --transcriptome=$REF --fastqs=$dir --project=$ID --chemistry=SC3Pv3  
-  
+```  
 ### Generate raw UMI counts from 10X single-cell data into a pickle format  
 See instructions in  section #6  
   
 ### Preprocessing UMI counts: filter, normalize, scale  
-  
+```  
 usage: 00.01.filter_normalize_scale_single_cell_data.py [-h] --data_dir DATA_DIR  
                                                         [--file_type FILE_TYPE]  
                                                         [--libsize_perc LIBSIZE_PERC]  
@@ -247,41 +251,45 @@ optional arguments:
                         few cells (default: 5)  
   
 example: python 00.01.filter_normalize_scale_single_cell_data.py --data_dir ./ --mit_cutoff -1 --min_cells 2 --file_type pickle  
-  
+```
+
 ### Combine preprocessed UMI pickle tables from multiple samples  
-See section #7 for instructions. Use the --not_raw option.  
+See the section "Combine pickle files" for instructions.  
+Use the --not_raw option.  
   
 ### Get a list of all the identified cells (after filtering)   
-See section #8 for instructions. Use low thresholds (1) to capture all cells.  
+See the section "A subset of cells with high expression of viral transcripts is selected." for instructions.  
+Use low thresholds (1) to capture all cells.  
 example: choose_cells.py --data_dir combined_data/. --sample_table sample_table_fastq.tsv --output_folder /. --sum 1 --count 1 --exp 1   
   
 ### Single-cell reads are extracted from each selected cell, trimmed, and aligned  
-See section #9 for example. Use the output of section #27.  
+See the section "Single-cell reads are extracted from each selected cell, trimmed, and assembled" for example.  
+Use the output of the previous section.  
   
 ### Transcripts and read files are named after the cell barcode  
-See section #10 for instructions.  
+See the section "Transcripts and read files are named after the cell barcode" for instructions.  
   
 ### Transcript files from each cell are concatenated   
-See section 11 for instructions.  
+See the section "Transcript files from each cell are concatanated" for instructions.  
   
 ### Transcripts are filtered using sortmerna against the pr2 database  
-See section 12 for instructions.  
+See the section "Transcripts are filtered using sortmerna against the pr2 database" for instructions.  
   
 ### Reads are aligned to PR2 and metaPR2 database using blast  
-See section 13 for instructions.  
+See the section "Reads are aligned to PR2 and metaPR2 database using blast" for instructions.  
   
 ### Blast results are summarized  
-See section 14 for instructions.  
+See the section "Blast results are summarized" for instructions.  
   
 ### Viral transcripts are determent from transcript reference  
 (frank)  
   
 ### Combine raw UMI pickle tables from multiple samples  
-See section #7 for instructions. Use the --raw option.  
+See the section "Combine pickle files" for instructions.  
+Use the --raw option.  
   
 ### Implement dimensionality reduction on processed UMI tables  
-  
-  
+```
 usage: 00.02.dimentionality_reduction_single_cell_data.py [-h] --data_dir DATA_DIR  
                                                           [--pca_components PCA_COMPONENTS]  
                                                           [--tsne_perplexity TSNE_PERPLEXITY]  
@@ -329,65 +337,59 @@ optional arguments:
   
   
 example: python 00.02.dimentionality_reduction_single_cell_data.py --data_dir ./ --min_dist 0.15 --spread 0.75 --pca_components 10   
-  
+```  
 ### Annotating cells, creating UMAP projection plots oh host-virus coexpression and extracting the barcodes of infected Katablepharidacea cells.   
 This is done in a jupyter notebook. explanations and input requirements are in the notebook:  
 Coexpression_wrapper.ipynb  
   
 ### Single-cell reads are extracted from each selected kata cell, trimmed, and poly-A removed  
-  
+```  
 pull_trim_clean.sh  
-  
-module load seqtk/1.2  
-module load TrimGalore/0.6.5   
+   
   
 usage:  
     pull_trim_clean.sh BARCODES FASTQ  
   
 arguments:  
 BARCODES    A file containing the cell barcodes   
-FASTQ       Path to raw fastq dir of a specific sample.   
-  
+FASTQ       Path to raw fastq dir of a specific sample.
+
+```  
 ### Concatenate trimmed fastq files from all cell barcodes and assemble reads altogether  
-  
-module load gcc/9.2.0  
-module load spades/3.15.0  
-  
+
+ ```
 cat */*trim*trim*.fq.gz All_cells.fq.gz  
   
 rnaspades.py --s 1 All_kata_cells.fq.gz -k 21 -t 8 -o $OUTDIR  
+```
   
 ### Transcripts are aligned to host 18s rRNA databases using blast  
-# Note that the identity is lower because we aim for a lower taxonomic level, therefore we except lower identity  
-  
+#### Note that the identity is lower because we aim for a lower taxonomic level, therefore we except lower identity  
+```  
 blastn -outfmt 6 -evalue 1e-10 -perc_identity 90 -query transcripts.fasta -subject 099.metapr2.fasta -out transcripts_kata.metaPR2.tsv  
 blastn -outfmt 6 -evalue 1e-10 -perc_identity 90 -query transcripts.fasta -subject 099.pr2.fasta -out transcripts_kata.PR2.tsv  
-  
+```  
 ### Transcripts are aligned to host viral marker gene databases using blast  
-  
+```  
 blastn -outfmt 6 -evalue 1e-10 -query transcripts.fasta -subject GVDB.markergenes.fna -out transcripts.GVDB.marker.tsv  
-  
-### After we find the virus with high certainitym, we align the reads to to virus transcriptome to measure gene expression  
-  
-# RSEM  
-  
-module load rsem/1.3.1  
-module load perl  
-module load bowtie2/2.3.3  
-  
+```  
+### After we find the virus with high certainity, we align the reads to to virus transcriptome to measure gene expression  
+Prepare rsem reference:  
+```
 rsem-prepare-reference \  
 --bowtie2 GVMAG-M-3300020187-27.fltr.fna.genes.fna \  
 GVMAG-M-3300020187-27.fltr.fna.genes.fna  
-  
+```
+Calculate gene expression
+```  
 rsem-calculate-expression -p 10 --bowtie2 --fragment-length-mean 58 All_cells.fq.gz GVMAG-M-3300020187-27.fltr.fna.genes.fna Kata_mapping  
-  
+``` 
 ### Annotate the virus genes  
+(Frank)
   
 ### Find relative abundance of different taxa in the mesocosm experiment and the relative abundance of Katablepharidles  
 This is done in a jupyter notebook:  
 relative_abundance_all.ipynb  
 The input data is the ASV analysis from Vincent et al. 2023 (Nature microbiology).  
 Explanations can be found in the notebook  
-#######  
-# END #  
-#######
+
