@@ -5,7 +5,7 @@ amir.fromm@weizmann.ac.il
 Code repository and instruction for repeating the results of the manuscript "Zooming into the rare virosphere reveals the native host of giant viruses" (2023). 
 
 ### Dependencies:  
-```
+
 cutadapt/4.2  
 cd-hit/4.6.6  
 sortmerna/4.3.6  
@@ -21,7 +21,9 @@ gcc/9.2.0
 spades/3.15.0  
 BLAST+/2.11.0  
 BBMap/38.90
-```
+
+### Scripts:
+
 ### Create a reference of viral marker genes  
 input: NCLDV marker genes file (link)  
 scripts:   
