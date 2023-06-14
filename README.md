@@ -22,7 +22,7 @@ spades/3.15.0
 BLAST+/2.11.0  
 BBmap
 
-### create a reference of viral marker genes  
+### Create a reference of viral marker genes  
 input: NCLDV marker genes file (link)  
 scripts:   
 create_gtf.sh  
@@ -39,7 +39,7 @@ c. create a reference file
 ```
 cellranger mkref --genome=$REFNAME --fasta=$FASTA --genes=$GTF --memgb=4  
 ```
-### map raw fastq files to the reference  
+### Map raw fastq files to the reference  
 ```
 cellranger count --id=$ID --transcriptome=$REF --fastqs=$dir --project=$ID --chemistry=SC3Pv3  
 ```
