@@ -215,8 +215,9 @@ output: deduplicated transcripts, with low-complexity transcripts removed from t
 filterbyname.sh in=cells.transcripts.95.bbduk.fasta out=cells.filtered.fasta include=t names=filtered_cells_list.txt substring  
 ```
 #### A new reference is curated from selected cells, E. huxleyi and E .huxleyi virus  
+``` 
 cat transcriptome_ehuxleyi.EhVM1.fasta cells.filtered.fasta > combined_cells_ehux.fasta  
-  
+```
 #### The new transcriptome is de-duplicated using cd-hit  
 ```
 cd-hit-est -c 0.95 -T 16 -i combined_cells_ehux.fasta -o combined_cells_ehux.95.fasta  
