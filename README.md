@@ -24,7 +24,9 @@ BBMap/38.90
 
 ### Scripts:
 
-### Create a reference of viral marker genes  
+------------------
+### A step-by step recreation of the results on the manuscript
+#### Create a reference of viral marker genes  
 input: NCLDV marker genes file (link)  
 scripts:   
 create_gtf.sh  
@@ -41,11 +43,11 @@ c. create a reference file
 ```
 cellranger mkref --genome=$REFNAME --fasta=$FASTA --genes=$GTF --memgb=4  
 ```
-### Map raw fastq files to the reference  
+#### Map raw fastq files to the reference  
 ```
 cellranger count --id=$ID --transcriptome=$REF --fastqs=$dir --project=$ID --chemistry=SC3Pv3  
 ```
-### Generate raw UMI counts from 10X single-cell data in a pickle format 
+#### Generate raw UMI counts from 10X single-cell data in a pickle format 
 ```
 script: 00.00.raw_UMI_counts_10X_data.py  
   
@@ -65,7 +67,7 @@ example: python 00.00.raw_UMI_counts_10X_data.py --data_dir ./
 ```
 output: data_raw.pickle.gz  
   
-### Combine pickle files  
+#### Combine pickle files  
 combine multiple UMI tables of different samples in a pickle format. 
 ```
 script: combine_pickle.py  
@@ -87,7 +89,7 @@ example: combine_pickle.py --data_dir ./ --list_folders "B7T16,B7T17,B7T18" --ou
 The name of each cell will be the barcode+the name of the folder containing the 10X outputs (for example, ATGCA.B7T17).  
 ```
 
-### A subset of cells with high expression of viral transcripts is selected.  
+#### A subset of cells with high expression of viral transcripts is selected.  
 ```
 usage:  
     choose_cells.py --data_dir DATA_DIR  
@@ -107,7 +109,7 @@ arguments:
 example: choose_cells.py --data_dir /. --sample_table sample_table_fastq.tsv --output_folder /. --sum 10 --count 2 --exp 2   
 
 ```
-### Single-cell reads are extracted from each selected cell, trimmed, and assembled  
+#### Single-cell reads are extracted from each selected cell, trimmed, and assembled  
 
 ```
 usage:  
@@ -118,7 +120,7 @@ BARCODES    a tab delimited file of cell barcodes and the raw fastq file of thei
 ```  
 output: multiple folders, one for each cell, containing single-cell reads, and a folder of the assembly. 
 
-### Transcripts and read files are named after the cell barcode  
+#### Transcripts and read files are named after the cell barcode  
 This needs to be executed in the parent folder containing per-cell folders.  
 ```
 for some_path in */  
@@ -135,11 +137,11 @@ done
 ```  
 output: Trimmed single cell reads from each cell, asssembled contigs from each cell, named after the cell barcode.  
   
-### Transcript files from each cell are concatanated   
+#### Transcript files from each cell are concatanated   
 ```  
 cat parent_folder/*/assembly/transcripts.edit.fasta > all_cells.transcripts.edit.fasta  
 ```
-### Transcripts are filtered using sortmerna against the pr2 database  
+#### Transcripts are filtered using sortmerna against the pr2 database  
 NOTE: We de-duplicated the pr2 database using cd-hit at 99% identity.   
 It is not obligatory but it accelerates the process.  
 ```    
@@ -150,12 +152,12 @@ sortmerna --ref  PR2.99.fasta \
 ```  
 output: sortmerna/all_cells.transcripts.edit.filtered.fa  
   
-### Reads are aligned to PR2 and metaPR2 database using blast  
+#### Reads are aligned to PR2 and metaPR2 database using blast  
 ```    
 blastn -outfmt 6 -evalue 1e-10 -perc_identity 99 -query all_cells.transcripts.edit.filtered.fa -subject 099.pr2.fasta -out transcripts.PR2.tsv  
 blastn -outfmt 6 -evalue 1e-10 -perc_identity 99 -query all_cells.transcripts.edit.filtered.fa -subject 099.metapr2.fasta -out transcripts.metaPR2.tsv  
 ``` 
-### Blast results are summarized  
+#### Blast results are summarized  
 Results of 18s rRNA homology against the PR2 and metaPR2 databases are summarized.  
 Pick only the best hit with identity of >= 99 percent and an alignment length of >100 bp  
 ```  
@@ -169,20 +171,20 @@ argument:
 ```  
 output: a summary file for each result file selected.  
   
-### Find homology to virus by mapping raw reads to virus marker genes  
+#### Find homology to virus by mapping raw reads to virus marker genes  
 (frank)  
   
-### Link results of 18S rRNA search and virus homology search to pair hosts and viruses  
+#### Link results of 18S rRNA search and virus homology search to pair hosts and viruses  
 The plot is produced in a jupyter notebook. explanations and input requirements are in the notebook:  
 sankey_wrapper.ipynb  
   
-### Creating a reference database from identified single-cells  
+#### Creating a reference database from identified single-cells  
   
 Assembled transcripts de-duplicated using cd-hit  
 ```    
 cd-hit-est -c 0.95 -T 32 -i all_cells.transcripts.edit.fasta -o all_cells.transcripts.95.fasta  
 ```  
-### Low-complexity transcripts are removed from the transcript file  
+#### Low-complexity transcripts are removed from the transcript file  
 
 input: deduplicated transcripts from all cells (cells.transcripts.95.fasta)  
 output: deduplicated transcripts, with low-complexity transcripts removed.  
@@ -191,21 +193,21 @@ bbduk.sh in=cells.transcripts.95.fasta out=cells.transcripts.95.bbduk.fasta outm
 ```
 NOTE: We also manually removed a long repetitive sequence from the output file.  
 
-### Transcripts are selected from the 72 linked cells in order to create a reference database   
+#### Transcripts are selected from the 72 linked cells in order to create a reference database   
   
 inputs: deduplicated transcripts, with low-complexity transcripts removed from all cells (cells.transcripts.95.bbduk.fasta); text file with barcodes from the 72 cells (filtered_cells_list.txt)  
 output: deduplicated transcripts, with low-complexity transcripts removed from the 72 identified cells  
 ```
 filterbyname.sh in=cells.transcripts.95.bbduk.fasta out=cells.filtered.fasta include=t names=filtered_cells_list.txt substring  
 ```
-### A new reference is curated from selected cells, E. huxleyi and E .huxleyi virus  
+#### A new reference is curated from selected cells, E. huxleyi and E .huxleyi virus  
 cat transcriptome_ehuxleyi.EhVM1.fasta cells.filtered.fasta > combined_cells_ehux.fasta  
   
-### The new transcriptome is de-duplicated using cd-hit  
+#### The new transcriptome is de-duplicated using cd-hit  
 ```
 cd-hit-est -c 0.95 -T 16 -i combined_cells_ehux.fasta -o combined_cells_ehux.95.fasta  
 ```
-### A reference database is built from from the combined transcriptome  
+#### A reference database is built from from the combined transcriptome  
   
 input: combined database file  
 scripts:   
@@ -219,14 +221,14 @@ b. create a reference file
 ```
 cellranger mkref --genome=$REFNAME --fasta=$FASTA --genes=$GTF --memgb=4  
 ```  
-### Map raw fastq files to the reference  
+#### Map raw fastq files to the reference  
 ```
 cellranger count --id=$ID --transcriptome=$REF --fastqs=$dir --project=$ID --chemistry=SC3Pv3  
 ```  
-### Generate raw UMI counts from 10X single-cell data into a pickle format  
+#### Generate raw UMI counts from 10X single-cell data into a pickle format  
 See instructions in  section #6  
   
-### Preprocessing UMI counts: filter, normalize, scale  
+#### Preprocessing UMI counts: filter, normalize, scale  
 ```  
 usage: 00.01.filter_normalize_scale_single_cell_data.py [-h] --data_dir DATA_DIR  
                                                         [--file_type FILE_TYPE]  
@@ -255,42 +257,42 @@ optional arguments:
 example: python 00.01.filter_normalize_scale_single_cell_data.py --data_dir ./ --mit_cutoff -1 --min_cells 2 --file_type pickle  
 ```
 
-### Combine preprocessed UMI pickle tables from multiple samples  
+#### Combine preprocessed UMI pickle tables from multiple samples  
 See the section "Combine pickle files" for instructions.  
 Use the --not_raw option.  
   
-### Get a list of all the identified cells (after filtering)   
+#### Get a list of all the identified cells (after filtering)   
 See the section "A subset of cells with high expression of viral transcripts is selected." for instructions.  
 Use low thresholds (1) to capture all cells.  
 example: choose_cells.py --data_dir combined_data/. --sample_table sample_table_fastq.tsv --output_folder /. --sum 1 --count 1 --exp 1   
   
-### Single-cell reads are extracted from each selected cell, trimmed, and aligned  
+#### Single-cell reads are extracted from each selected cell, trimmed, and aligned  
 See the section "Single-cell reads are extracted from each selected cell, trimmed, and assembled" for example.  
 Use the output of the previous section.  
   
-### Transcripts and read files are named after the cell barcode  
+#### Transcripts and read files are named after the cell barcode  
 See the section "Transcripts and read files are named after the cell barcode" for instructions.  
   
-### Transcript files from each cell are concatenated   
+#### Transcript files from each cell are concatenated   
 See the section "Transcript files from each cell are concatanated" for instructions.  
   
-### Transcripts are filtered using sortmerna against the pr2 database  
+#### Transcripts are filtered using sortmerna against the pr2 database  
 See the section "Transcripts are filtered using sortmerna against the pr2 database" for instructions.  
   
-### Reads are aligned to PR2 and metaPR2 database using blast  
+#### Reads are aligned to PR2 and metaPR2 database using blast  
 See the section "Reads are aligned to PR2 and metaPR2 database using blast" for instructions.  
   
-### Blast results are summarized  
+#### Blast results are summarized  
 See the section "Blast results are summarized" for instructions.  
   
-### Viral transcripts are determent from transcript reference  
+#### Viral transcripts are determent from transcript reference  
 (frank)  
   
-### Combine raw UMI pickle tables from multiple samples  
+#### Combine raw UMI pickle tables from multiple samples  
 See the section "Combine pickle files" for instructions.  
 Use the --raw option.  
   
-### Implement dimensionality reduction on processed UMI tables  
+#### Implement dimensionality reduction on processed UMI tables  
 ```
 usage: 00.02.dimentionality_reduction_single_cell_data.py [-h] --data_dir DATA_DIR  
                                                           [--pca_components PCA_COMPONENTS]  
@@ -340,11 +342,11 @@ optional arguments:
   
 example: python 00.02.dimentionality_reduction_single_cell_data.py --data_dir ./ --min_dist 0.15 --spread 0.75 --pca_components 10   
 ```  
-### Annotating cells, creating UMAP projection plots oh host-virus coexpression and extracting the barcodes of infected Katablepharidacea cells.   
+#### Annotating cells, creating UMAP projection plots oh host-virus coexpression and extracting the barcodes of infected Katablepharidacea cells.   
 This is done in a jupyter notebook. explanations and input requirements are in the notebook:  
 Coexpression_wrapper.ipynb  
   
-### Single-cell reads are extracted from each selected kata cell, trimmed, and poly-A removed  
+#### Single-cell reads are extracted from each selected kata cell, trimmed, and poly-A removed  
 ```  
 pull_trim_clean.sh  
    
@@ -357,7 +359,7 @@ BARCODES    A file containing the cell barcodes
 FASTQ       Path to raw fastq dir of a specific sample.
 
 ```  
-### Concatenate trimmed fastq files from all cell barcodes and assemble reads altogether  
+#### Concatenate trimmed fastq files from all cell barcodes and assemble reads altogether  
 
  ```
 cat */*trim*trim*.fq.gz All_cells.fq.gz  
@@ -365,17 +367,17 @@ cat */*trim*trim*.fq.gz All_cells.fq.gz
 rnaspades.py --s 1 All_kata_cells.fq.gz -k 21 -t 8 -o $OUTDIR  
 ```
   
-### Transcripts are aligned to host 18s rRNA databases using blast  
-#### Note that the identity is lower because we aim for a lower taxonomic level, therefore we except lower identity  
+#### Transcripts are aligned to host 18s rRNA databases using blast  
+Note that the identity is lower because we aim for a lower taxonomic level, therefore we except lower identity  
 ```  
 blastn -outfmt 6 -evalue 1e-10 -perc_identity 90 -query transcripts.fasta -subject 099.metapr2.fasta -out transcripts_kata.metaPR2.tsv  
 blastn -outfmt 6 -evalue 1e-10 -perc_identity 90 -query transcripts.fasta -subject 099.pr2.fasta -out transcripts_kata.PR2.tsv  
 ```  
-### Transcripts are aligned to host viral marker gene databases using blast  
+#### Transcripts are aligned to host viral marker gene databases using blast  
 ```  
 blastn -outfmt 6 -evalue 1e-10 -query transcripts.fasta -subject GVDB.markergenes.fna -out transcripts.GVDB.marker.tsv  
 ```  
-### After we find the virus with high certainity, we align the reads to to virus transcriptome to measure gene expression  
+#### After we find the virus with high certainity, we align the reads to to virus transcriptome to measure gene expression  
 Prepare rsem reference:  
 ```
 rsem-prepare-reference \  
@@ -386,10 +388,10 @@ Calculate gene expression
 ```  
 rsem-calculate-expression -p 10 --bowtie2 --fragment-length-mean 58 All_cells.fq.gz GVMAG-M-3300020187-27.fltr.fna.genes.fna Kata_mapping  
 ``` 
-### Annotate the virus genes  
+#### Annotate the virus genes  
 (Frank)
   
-### Find relative abundance of different taxa in the mesocosm experiment and the relative abundance of Katablepharidles  
+#### Find relative abundance of different taxa in the mesocosm experiment and the relative abundance of Katablepharidles  
 This is done in a jupyter notebook:  
 relative_abundance_all.ipynb  
 The input data is the ASV analysis from Vincent et al. 2023 (Nature microbiology).  
