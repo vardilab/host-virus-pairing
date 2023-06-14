@@ -4,7 +4,7 @@ Written by Amir Fromm
 amir.fromm@weizmann.ac.il  
 Code repository and instruction for repeating the results of the manuscript "Zooming into the rare virosphere reveals the native host of giant viruses" (2023). 
 
-### Dependencies:  
+### Dependencies  
 python/3.8
 cutadapt/4.2  
 cd-hit/4.6.6  
@@ -22,7 +22,7 @@ spades/3.15.0
 BLAST+/2.11.0  
 BBMap/38.90
 
-### Scripts:
+### Scripts
 
 ```assemble_cells.sh``` - Pull reads of cells by barcode, trim reads and assemble them (for each cell)  
 ```pull_trim_clean.sh``` - Pull reads of cells by barcode and trim reads without assembling  
