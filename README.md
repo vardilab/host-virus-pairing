@@ -1,13 +1,14 @@
   
-# 16-5-23  
-# Written by Amir Fromm  
-# amir.fromm@weizmann.ac.il  
-  
-# README file, Zooming into the rare virosphere reveals the native host of giant viruses  
+# Zooming into the rare virosphere reveals the native host of giant viruses
+Written by Amir Fromm  
+amir.fromm@weizmann.ac.il  
+Code repository and instruction for repeating the results of the manuscript "Zooming into the rare virosphere reveals the native host of giant viruses" (2023). 
+
 Dependencies:  
 
 cutadapt  
-cd-hit/4.6.6
+cd-hit/4.6.6  
+sortmerna/4.3.6  
 bioawk  
 bcl2fastq  
 cellranger  
@@ -15,12 +16,9 @@ seqtk/1.2
 TrimGalore/0.6.5   
 gcc/9.2.0  
 spades/3.15.0  
+BLAST+/2.11.0  
+BBmap
 
-### Samples were collected from the natural environment and fixed until sequencing  
-  
-### Single-cell RNA-seq is performed using 10X genomics  
-output: raw fastq files (link)  
-  
 ### create a reference of viral marker genes  
 input: NCLDV marker genes file (link)  
 scripts:   
@@ -106,19 +104,18 @@ example: choose_cells.py --data_dir /. --sample_table sample_table_fastq.tsv --o
 ```
 ### Single-cell reads are extracted from each selected cell, trimmed, and assembled  
 
-  
+```
 usage:  
     assemble_cells.sh BARCODES  
   
 arguments:  
 BARCODES    a tab delimited file of cell barcodes and the raw fastq file of their sample (output of choose_cells.py)  
-  
-output: multiple folders, one for each cell, containing single-cell reads, and a folder of the assembly.  
-  
+```  
+output: multiple folders, one for each cell, containing single-cell reads, and a folder of the assembly. 
+
 ### Transcripts and read files are named after the cell barcode  
 This needs to be executed in the parent folder containing per-cell folders.  
-  
-  
+```
 for some_path in */  
 do  
     CELL=$(basename $some_path)  
@@ -130,37 +127,33 @@ do
     cat $some_path/*.filtered_trimmed_trimmed.fq.gz > $some_path/$CELL.$ID.combined.fq.gz  
     sed "s/>.*/&_$CELL.$ID/" $some_path/assembly/transcripts.fasta > $some_path/assembly/transcripts.edit.fasta  
 done  
-  
+```  
 output: Trimmed single cell reads from each cell, asssembled contigs from each cell, named after the cell barcode.  
   
 ### Transcript files from each cell are concatanated   
-  
+```  
 cat parent_folder/*/assembly/transcripts.edit.fasta > all_cells.transcripts.edit.fasta  
-  
+```
 ### Transcripts are filtered using sortmerna against the pr2 database  
 NOTE: We de-duplicated the pr2 database using cd-hit at 99% identity.   
 It is not obligatory but it accelerates the process.  
-  
-module load sortmerna  
-  
+```    
 sortmerna --ref  PR2.99.fasta \  
 --reads all_cells.transcripts.edit.fasta \  
 --aligned sortmerna/all_cells.transcripts.edit.filtered \  
 -fastx sortmerna/all_cells.transcripts.edit.filtered  
-  
+```  
 output: sortmerna/all_cells.transcripts.edit.filtered.fa  
   
 ### Reads are aligned to PR2 and metaPR2 database using blast  
-  
-module load BLAST+/2.11.0-gompi-2020b  
-  
+```    
 blastn -outfmt 6 -evalue 1e-10 -perc_identity 99 -query all_cells.transcripts.edit.filtered.fa -subject 099.pr2.fasta -out transcripts.PR2.tsv  
 blastn -outfmt 6 -evalue 1e-10 -perc_identity 99 -query all_cells.transcripts.edit.filtered.fa -subject 099.metapr2.fasta -out transcripts.metaPR2.tsv  
-  
+``` 
 ### Blast results are summarized  
 Results of 18s rRNA homology against the PR2 and metaPR2 databases are summarized.  
 Pick only the best hit with identity of >= 99 percent and an alignment length of >100 bp  
-  
+```  
 usage:  
     01.summarize_blast.py --data_dir DATA_DIR   
                         --database DB  
@@ -168,7 +161,7 @@ usage:
 argument:  
     --data_dir DATA_DIR Path to directory containing the blast results file  
     --database DB       Name of database used (either metaPR2 or PR2) name has to be: all_cells.transcripts.edit. + DB + .tsv  
-  
+```  
 output: a summary file for each result file selected.  
   
 ### Find homology to virus by mapping raw reads to virus marker genes  
@@ -181,28 +174,25 @@ sankey_wrapper.ipynb
 ### Creating a reference database from identified single-cells  
   
 Assembled transcripts de-duplicated using cd-hit  
-  
-module load cd-hit  
-  
+```    
 cd-hit-est -c 0.95 -T 32 -i all_cells.transcripts.edit.fasta -o all_cells.transcripts.95.fasta  
-  
+```  
 ### Low-complexity transcripts are removed from the transcript file  
-module load BBMap  
-  
+
 input: deduplicated transcripts from all cells (cells.transcripts.95.fasta)  
 output: deduplicated transcripts, with low-complexity transcripts removed.  
-NOTE: We also manually removed a long repetitive sequence from the output file.  
-  
+```  
 bbduk.sh in=cells.transcripts.95.fasta out=cells.transcripts.95.bbduk.fasta outm=low_complexity.fq entropy=0.7  
-  
+```
+NOTE: We also manually removed a long repetitive sequence from the output file.  
+
 ### Transcripts are selected from the 72 linked cells in order to create a reference database   
   
 inputs: deduplicated transcripts, with low-complexity transcripts removed from all cells (cells.transcripts.95.bbduk.fasta); text file with barcodes from the 72 cells (filtered_cells_list.txt)  
 output: deduplicated transcripts, with low-complexity transcripts removed from the 72 identified cells  
-  
-module load BBMap  
+```
 filterbyname.sh in=cells.transcripts.95.bbduk.fasta out=cells.filtered.fasta include=t names=filtered_cells_list.txt substring  
-  
+```
 ### A new reference is curated from selected cells, E. huxleyi and E .huxleyi virus  
 cat transcriptome_ehuxleyi.EhVM1.fasta cells.filtered.fasta > combined_cells_ehux.fasta  
   
