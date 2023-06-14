@@ -5,7 +5,7 @@ amir.fromm@weizmann.ac.il
 Code repository and instruction for repeating the results of the manuscript "Zooming into the rare virosphere reveals the native host of giant viruses" (2023). 
 
 ### Dependencies:  
-
+python/3.8
 cutadapt/4.2  
 cd-hit/4.6.6  
 sortmerna/4.3.6  
@@ -184,7 +184,7 @@ Assembled transcripts de-duplicated using cd-hit
 ```    
 cd-hit-est -c 0.95 -T 32 -i all_cells.transcripts.edit.fasta -o all_cells.transcripts.95.fasta  
 ```  
-#### Low-complexity transcripts are removed from the transcript file  
+#### Low-complexity transcripts are removed from the transcript file using bbduk.sh utility from BBmap 
 
 input: deduplicated transcripts from all cells (cells.transcripts.95.fasta)  
 output: deduplicated transcripts, with low-complexity transcripts removed.  
@@ -193,7 +193,7 @@ bbduk.sh in=cells.transcripts.95.fasta out=cells.transcripts.95.bbduk.fasta outm
 ```
 NOTE: We also manually removed a long repetitive sequence from the output file.  
 
-#### Transcripts are selected from the 72 linked cells in order to create a reference database   
+#### Transcripts are selected from the 72 linked cells in order to create a reference database using filterbyname.sh utility from BBmap    
   
 inputs: deduplicated transcripts, with low-complexity transcripts removed from all cells (cells.transcripts.95.bbduk.fasta); text file with barcodes from the 72 cells (filtered_cells_list.txt)  
 output: deduplicated transcripts, with low-complexity transcripts removed from the 72 identified cells  
@@ -210,8 +210,7 @@ cd-hit-est -c 0.95 -T 16 -i combined_cells_ehux.fasta -o combined_cells_ehux.95.
 #### A reference database is built from from the combined transcriptome  
   
 input: combined database file  
-scripts:   
-create_gtf.sh  
+script: create_gtf.sh  
   
 a. create a pseudo-GTF file  
 ```  
@@ -348,9 +347,8 @@ Coexpression_wrapper.ipynb
   
 #### Single-cell reads are extracted from each selected kata cell, trimmed, and poly-A removed  
 ```  
-pull_trim_clean.sh  
+script: pull_trim_clean.sh  
    
-  
 usage:  
     pull_trim_clean.sh BARCODES FASTQ  
   
