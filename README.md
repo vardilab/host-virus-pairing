@@ -9,7 +9,7 @@ python/3.8
 cutadapt/4.2  
 cd-hit/4.6.6  
 sortmerna/4.3.6  
-bioawk  
+bioawk/1
 bcl2fastq/2.20.0.422  
 cellranger/5.0.0  
 rsem/1.3.1  
@@ -23,6 +23,20 @@ BLAST+/2.11.0
 BBMap/38.90
 
 ### Scripts:
+
+```assemble_cells.sh``` - Pull reads of cells by barcode, trim reads and assemble them (for each cell) 
+```pull_trim_clean.sh`` - Pull reads of cells by barcode and trim reads without assembling 
+```create_gtf.sh``` - Create a pseudo-gft file  
+```00.00.raw_UMI_counts_10X_data.py``` - Convert cellranger count metrix to pickle  
+```00.01.filter_normalize_scale_single_cell_data.py```  - Preprocessing UMI tables
+```00.02.dimentionality_reduction_single_cell_data.py``` - Dimentionality reduction for UMI tables  
+```combine_pickle.py``` - Combine multiple UMI tables in a pickle format   
+```summarize_blast.py```  - Summarize blast results
+```choose_cells.py``` - Extract barcodes of cells based on the cell's overall gene expression  
+```sankey_wrapper.ipynb``` - Annotate cells and create the Sankey plot (Fig 2)  
+```Coexpression_wrapper.ipynb``` - Annotate cells and create UMAP plot (Fig 3)  
+```relative_abundance_all.ipynb``` - Create relative abundance plot (Fig. 4)  
+
 
 ------------------
 ### A step-by step recreation of the results on the manuscript
