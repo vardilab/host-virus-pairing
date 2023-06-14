@@ -6,12 +6,12 @@ Code repository and instruction for repeating the results of the manuscript "Zoo
 
 ### Dependencies:  
 ```
-cutadapt  
+cutadapt/4.2  
 cd-hit/4.6.6  
 sortmerna/4.3.6  
 bioawk  
-bcl2fastq  
-cellranger  
+bcl2fastq/2.20.0.422  
+cellranger/5.0.0  
 rsem/1.3.1  
 perl  
 bowtie2/2.3.3  
@@ -20,7 +20,7 @@ TrimGalore/0.6.5
 gcc/9.2.0  
 spades/3.15.0  
 BLAST+/2.11.0  
-BBmap
+BBMap/38.90
 ```
 ### Create a reference of viral marker genes  
 input: NCLDV marker genes file (link)  
