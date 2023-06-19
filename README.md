@@ -404,7 +404,15 @@ rsem-calculate-expression -p 10 --bowtie2 --fragment-length-mean 58 All_cells.fq
 ``` 
 #### Annotate the virus genes  
 (Frank)
-  
+
+#### Create circos plot
+Using ShinyCircos V2.0 (https://github.com/YaoLab-Bioinfo/shinyCircos-V2.0) with the following files:
+```
+contigs_rect.csv    # Virus contigs
+data_barplot_color_expression.csv   # Gene expression data, log2 transformed
+labels_genes_chaperons.csv  # Labels for cell-fate regulatory genes
+labels_genes_mcp.csv  # Labels for giant virus marker genes genes
+```   
 #### Find relative abundance of different taxa in the mesocosm experiment and the relative abundance of Katablepharidles  
 This is done in a jupyter notebook:  
 relative_abundance_all.ipynb  
