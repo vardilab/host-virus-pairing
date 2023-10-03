@@ -1,5 +1,5 @@
   
-# Zooming into the rare virosphere reveals the native host of giant viruses
+# Homing in on the rare virosphere reveals the native host of giant viruses
 Code repository and instruction for repeating the results of the manuscript "Zooming into the rare virosphere reveals the native host of giant viruses" (2023). 
 
 amir.fromm@weizmann.ac.il  
