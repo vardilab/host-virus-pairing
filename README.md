@@ -281,7 +281,7 @@ See the section "A subset of cells with high expression of viral transcripts is 
 Use low thresholds (1) to capture all cells.  
 example: choose_cells.py --data_dir combined_data/. --sample_table sample_table_fastq.tsv --output_folder /. --sum 1 --count 1 --exp 1   
   
-#### Single-cell reads are extracted from each selected cell, trimmed, and aligned  
+#### Single-cell reads are extracted from each selected cell, trimmed, and assembled  
 See the section "Single-cell reads are extracted from each selected cell, trimmed, and assembled" for example.  
 Use the output of the previous section.  
   
