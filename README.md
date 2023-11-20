@@ -32,10 +32,9 @@ BBMap/38.90
 ```00.01.filter_normalize_scale_single_cell_data.py```  - Preprocessing UMI tables
 ```00.02.dimentionality_reduction_single_cell_data.py``` - Dimentionality reduction for UMI tables  
 ```combine_pickle.py``` - Combine multiple UMI tables in a pickle format   
-```summarize_blast.py```  - Summarize blast results  
 ```choose_cells.py``` - Extract barcodes of cells based on the cell's overall gene expression  
-```sankey_wrapper.ipynb``` - Annotate cells and create the Sankey plot (Fig 2)  
-```Coexpression_wrapper.ipynb``` - Annotate cells and create UMAP plot (Fig 3)  
+```sankey_wrapper_extended.ipynb``` - Annotate cells and create the Sankey plot (Fig 2)  
+```Coexpression_wrapper_extened.ipynb``` - Annotate cells and create UMAP plot (Fig 3)  
 ```relative_abundance_all.ipynb``` - Create relative abundance plot (Fig. 4)  
 
 
@@ -172,26 +171,17 @@ output: sortmerna/all_cells.transcripts.edit.filtered.fa
 blastn -outfmt 6 -evalue 1e-10 -perc_identity 99 -query all_cells.transcripts.edit.filtered.fa -subject 099.pr2.fasta -out transcripts.PR2.tsv  
 blastn -outfmt 6 -evalue 1e-10 -perc_identity 99 -query all_cells.transcripts.edit.filtered.fa -subject 099.metapr2.fasta -out transcripts.metaPR2.tsv  
 ``` 
-#### Blast results are summarized  
-Results of 18s rRNA homology against the PR2 and metaPR2 databases are summarized.  
-Pick only the best hit with identity of >= 99 percent and an alignment length of >100 bp  
-```  
-usage:  
-    summarize_blast.py --data_dir DATA_DIR   
-                        --database DB  
-  
-argument:  
-    --data_dir DATA_DIR Path to directory containing the blast results file  
-    --database DB       Name of database used (either metaPR2 or PR2) name has to be: all_cells.transcripts.edit. + DB + .tsv  
-```  
-output: a summary file for each result file selected.  
-  
+
 #### Find homology to virus by mapping raw reads to virus marker genes  
 (frank)  
   
 #### Link results of 18S rRNA search and virus homology search to pair hosts and viruses  
-The plot is produced in a jupyter notebook. explanations and input requirements are in the notebook:  
-sankey_wrapper.ipynb  
+
+The plot is produced in a jupyter notebook. 
+Results of 18s rRNA homology against the PR2 and metaPR2 databases are summarized and linked with the results of the virus homology.  
+Chimeric contigs and ambigous cells are removed.
+explanations and input requirements are in the notebook:  
+sankey_wrapper_extended.ipynb  
   
 #### Creating a reference database from identified single-cells  
   
@@ -297,9 +287,6 @@ See the section "Transcripts are filtered using sortmerna against the pr2 databa
 #### Reads are aligned to PR2 and metaPR2 database using blast  
 See the section "Reads are aligned to PR2 and metaPR2 database using blast" for instructions.  
   
-#### Blast results are summarized  
-See the section "Blast results are summarized" for instructions.  
-  
 #### Viral transcripts are determent from transcript reference  
 (frank)  
   
@@ -358,8 +345,8 @@ optional arguments:
 example: python 00.02.dimentionality_reduction_single_cell_data.py --data_dir ./ --min_dist 0.15 --spread 0.75 --pca_components 10   
 ```  
 #### Annotating cells, creating UMAP projection plots oh host-virus coexpression and extracting the barcodes of infected Katablepharidacea cells.   
-This is done in a jupyter notebook. explanations and input requirements are in the notebook:  
-Coexpression_wrapper.ipynb  
+This is done in a jupyter notebook. Annotation of cells is similar to the the pipeline of the Sankey plot. explanations and input requirements are in the notebook:  
+Coexpression_wrapper_extended.ipynb  
   
 #### Single-cell reads are extracted from each selected kata cell, trimmed, and poly-A removed  
 ```  
