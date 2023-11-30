@@ -193,7 +193,10 @@ Results of 18s rRNA homology against the PR2 and metaPR2 databases are summarize
 Chimeric contigs and ambigous cells are removed.
 explanations and input requirements are in the notebook:  
 sankey_wrapper_extended.ipynb  
-  
+
+#### Create phylogenetic trees of 18s rRNA and viral marker genes
+Run the bash codes in the folder "marker_gene_trees" in the script folder.
+
 #### Creating a reference database from identified single-cells  
   
 Assembled transcripts de-duplicated using cd-hit  
@@ -209,10 +212,10 @@ bbduk.sh in=cells.transcripts.95.fasta out=cells.transcripts.95.bbduk.fasta outm
 ```
 NOTE: We also manually removed a long repetitive sequence from the output file.  
 
-#### Transcripts are selected from the 72 linked cells in order to create a reference database using filterbyname.sh utility from BBmap    
+#### Transcripts are selected from the linked cells in order to create a reference database using filterbyname.sh utility from BBmap    
   
-inputs: deduplicated transcripts, with low-complexity transcripts removed from all cells (cells.transcripts.95.bbduk.fasta); text file with barcodes from the 72 cells (filtered_cells_list.txt)  
-output: deduplicated transcripts, with low-complexity transcripts removed from the 72 identified cells  
+inputs: deduplicated transcripts, with low-complexity transcripts removed from all cells (cells.transcripts.95.bbduk.fasta); text file with barcodes from the cells (filtered_cells_list.txt)  
+output: deduplicated transcripts, with low-complexity transcripts removed from the identified cells  
 ```
 filterbyname.sh in=cells.transcripts.95.bbduk.fasta out=cells.filtered.fasta include=t names=filtered_cells_list.txt substring  
 ```
