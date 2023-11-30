@@ -151,7 +151,7 @@ done
 ```  
 output: Trimmed single cell reads from each cell, asssembled contigs from each cell, named after the cell barcode.  
   
-#### Transcript files from each cell are concatanated   
+#### Transcript files from each cell are concatenated   
 ```  
 cat parent_folder/*/assembly/transcripts.edit.fasta > all_cells.transcripts.edit.fasta  
 ```
@@ -173,7 +173,18 @@ blastn -outfmt 6 -evalue 1e-10 -perc_identity 99 -query all_cells.transcripts.ed
 ``` 
 
 #### Find homology to virus by mapping raw reads to virus marker genes  
-(frank)  
+
+Each Read file are matched against a combined dataset constructed by combining RefSeq v. 207 with all predicted proteins in the Giant Virus Database. The output will also contain matches to eukaryotes and bacteria that should be removed after running the script.
+Make sure that in the script, the regex command looks for the suffix "fq.gz".
+```
+script: combine_pickle.py  
+usage:   
+    combine_pickle.py --data_dir DATA_DIR
+arguments:  
+    --data_dir DATA_DIR     Path to directory containing the read files
+output:lastout.parsed
+
+```
   
 #### Link results of 18S rRNA search and virus homology search to pair hosts and viruses  
 
@@ -288,7 +299,7 @@ See the section "Transcripts are filtered using sortmerna against the pr2 databa
 See the section "Reads are aligned to PR2 and metaPR2 database using blast" for instructions.  
   
 #### Viral transcripts are determent from transcript reference  
-(frank)  
+Same as finding homology to virus reads except that the suffix in the script should be changed to "fasta" instead of "fq.gz"
   
 #### Combine raw UMI pickle tables from multiple samples  
 See the section "Combine pickle files" for instructions.  
@@ -389,8 +400,6 @@ Calculate gene expression
 ```  
 rsem-calculate-expression -p 10 --bowtie2 --fragment-length-mean 58 All_cells.fq.gz GVMAG-M-3300020187-27.fltr.fna.genes.fna Kata_mapping  
 ``` 
-#### Annotate the virus genes  
-(Frank)
 
 #### Create circos plot
 Using ShinyCircos V2.0 (https://github.com/YaoLab-Bioinfo/shinyCircos-V2.0) with the following files:
