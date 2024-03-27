@@ -177,12 +177,7 @@ blastn -outfmt 6 -evalue 1e-10 -perc_identity 99 -query all_cells.transcripts.ed
 Each Read file are matched against a combined dataset constructed by combining RefSeq v. 207 with all predicted proteins in the Giant Virus Database. The output will also contain matches to eukaryotes and bacteria that should be removed after running the script.
 Make sure that in the script, the regex command looks for the suffix "fq.gz".
 ```
-script: combine_pickle.py  
-usage:   
-    combine_pickle.py --data_dir DATA_DIR
-arguments:  
-    --data_dir DATA_DIR     Path to directory containing the read files
-output:lastout.parsed
+script: homology_search.py
 
 ```
   
